@@ -53,11 +53,13 @@ class RandomSeekDataLoader(BaseDataLoader):
         super().__init__(dataset=dataset, batch_size=batch_size, gpu_id=gpu_id)
 
     def init_workers_stream(self) -> RandomSeekWorkersStream:
-        nvdec_streams = [
-            RandomSeekWorkerStream(self.dataset, self._index_queue, self._result_queue,
-                                   NvDecFrameFetcher, self.gpu_id)
-            for _ in range(self.num_nvdec_workers)
-        ]
+        nvdec_streams = []
+        if NvDecFrameFetcher is not None:
+            nvdec_streams = [
+                RandomSeekWorkerStream(self.dataset, self._index_queue, self._result_queue,
+                                       NvDecFrameFetcher, self.gpu_id)
+                for _ in range(self.num_nvdec_workers)
+            ]
         opencv_streams = [
             RandomSeekWorkerStream(self.dataset, self._index_queue, self._result_queue,
                                    OpencvFrameFetcher, self.gpu_id)

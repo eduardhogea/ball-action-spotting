@@ -7,7 +7,7 @@ import numpy as np
 import torch
 
 from src.indexes import StackIndexesGenerator, FrameIndexShaker
-from src.frame_fetchers import AbstractFrameFetcher, NvDecFrameFetcher
+from src.frame_fetchers import AbstractFrameFetcher, NvDecFrameFetcher, OpencvFrameFetcher
 from src.utils import set_random_seed
 from src.target import VideoTarget
 
@@ -77,6 +77,8 @@ class ActionDataset(metaclass=abc.ABCMeta):
             frame_fetcher_class: Type[AbstractFrameFetcher] = NvDecFrameFetcher,
             gpu_id: int = 0) -> tuple[torch.Tensor, torch.Tensor]:
         video_index, frame_indexes = self.get_video_frame_indexes(index)
+        if frame_fetcher_class is None:
+            frame_fetcher_class = OpencvFrameFetcher
         frame_fetcher = self.get_frame_fetcher(video_index, frame_fetcher_class, gpu_id)
         frames, targets = self.get_frames_targets(video_index, frame_indexes, frame_fetcher)
         return self.process_frames_targets(frames, targets)

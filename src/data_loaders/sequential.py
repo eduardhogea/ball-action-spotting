@@ -6,7 +6,7 @@ from rosny import ProcessStream
 import torch
 
 from src.data_loaders.base_data_loader import BaseDataLoader
-from src.frame_fetchers import NvDecFrameFetcher
+from src.frame_fetchers import NvDecFrameFetcher, OpencvFrameFetcher
 from src.datasets import ActionDataset
 
 
@@ -38,8 +38,9 @@ class SequentialWorkerStream(ProcessStream):
             self._last_frame_index = 0
         else:
             self._video_index = video_index
+            fetcher_cls = NvDecFrameFetcher or OpencvFrameFetcher
             self._frame_fetcher = self._dataset.get_frame_fetcher(
-                video_index, NvDecFrameFetcher, self._gpu_id
+                video_index, fetcher_cls, self._gpu_id
             )
             self._last_frame_index = 0
         self._frame_index2frame = dict()
